@@ -1,7 +1,6 @@
 package cmap
 
 import (
-	"encoding/json"
 	"hash/fnv"
 	"sort"
 	"strconv"

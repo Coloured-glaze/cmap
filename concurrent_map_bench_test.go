@@ -88,11 +88,15 @@ func BenchmarkSingleInsertAbsentSyncMap(b *testing.B) {
 	}
 }
 
+// cpu: Intel(R) Core(TM) i3-10100F CPU @ 3.60GHz
+// BenchmarkSingleInsertPresent-8   	 4071336	       291.6 ns/op	      48 B/op	       1 allocs/op
+// BenchmarkSingleInsertPresent-8   	33900822	        35.37 ns/op	       0 B/op	       0 allocs/o
 func BenchmarkSingleInsertPresent(b *testing.B) {
 	m := New[string]()
 	m.Set("key", "value")
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
+		// go m.Set("key", "value")
 		m.Set("key", "value")
 	}
 }
@@ -174,6 +178,9 @@ func BenchmarkMultiInsertSameSyncMap(b *testing.B) {
 	}
 }
 
+// cpu: Intel(R) Core(TM) i3-10100F CPU @ 3.60GHz
+// BenchmarkMultiGetSame-8   	 2392080	       498.2 ns/op	      16 B/op	       1 allocs/op
+// BenchmarkMultiGetSame-8   	 4393612	       238.5 ns/op	       0 B/op	       0 allocs/op
 func BenchmarkMultiGetSame(b *testing.B) {
 	m := New[string]()
 	finished := make(chan struct{}, b.N)
@@ -182,9 +189,22 @@ func BenchmarkMultiGetSame(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		go get("key", "value")
+		// get("key", "value")
 	}
 	for i := 0; i < b.N; i++ {
 		<-finished
+	}
+}
+
+// BenchmarkMultiGetSame2-8   	 4920494	       225.2 ns/op	      48 B/op	       1 allocs/op
+// BenchmarkMultiGetSame2-8   	63326876	        19.45 ns/op	       0 B/op	       0 allocs/op
+func BenchmarkMultiGetSame2(b *testing.B) {
+	m := New[string]()
+	m.Set("key", "value")
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		//	go m.Get("key")
+		m.Get("key")
 	}
 }
 
@@ -200,6 +220,34 @@ func BenchmarkMultiGetSameSyncMap(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		<-finished
 	}
+}
+
+// BenchmarkMultiGetSameSyncMap2-8   	 5505602	       216.3 ns/op	      32 B/op	       1 allocs/op
+// BenchmarkMultiGetSameSyncMap2-8   	62824522	        18.80 ns/op	       0 B/op	       0 allocs/op
+func BenchmarkMultiGetSameSyncMap2(b *testing.B) {
+	var m sync.Map
+	m.Store("key", "value")
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		// go m.Load("key")
+		m.Load("key")
+	}
+}
+
+// BenchmarkMultiGetSameMap-8   	 4691526	       254.8 ns/op	      49 B/op	       3 allocs/op
+// BenchmarkMultiGetSameMap-8   	356029417	         3.365 ns/op	       0 B/op	       0 allocs/op
+func BenchmarkMultiGetSameMap(b *testing.B) {
+	var m = make(map[string]string)
+	m["key"] = ""
+	var ok bool
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		// go func() {
+		// 	v, ok = m["key"]
+		// }()
+		_, ok = m["key"]
+	}
+	_ = ok
 }
 
 func benchmarkMultiGetSetDifferent(b *testing.B) {
@@ -291,7 +339,6 @@ func BenchmarkMultiGetSetBlock_32_Shard(b *testing.B) {
 func BenchmarkMultiGetSetBlock_256_Shard(b *testing.B) {
 	runWithShards(benchmarkMultiGetSetBlock, b, 256)
 }
-
 
 func GetSet[K comparable, V any](m ConcurrentMap[K, V], finished chan struct{}) (set func(key K, value V), get func(key K, value V)) {
 	return func(key K, value V) {

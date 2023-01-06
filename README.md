@@ -1,63 +1,74 @@
-# concurrent map [![Build Status](https://travis-ci.com/orcaman/concurrent-map.svg?branch=master)](https://travis-ci.com/orcaman/concurrent-map)
+# concurrent map [![Build Status](https://travis-ci.com/Coloured-glaze/cmap.svg?branch=master)](https://travis-ci.com/Coloured-glaze/cmap)
 
-As explained [here](http://golang.org/doc/faq#atomic_maps) and [here](http://blog.golang.org/go-maps-in-action), the `map` type in Go doesn't support concurrent reads and writes. `concurrent-map` provides a high-performance solution to this by sharding the map with minimal time spent waiting for locks.
+正如 [这里](http://golang.org/doc/faq#atomic_maps) 和 [这里](http://blog.golang.org/go-maps-in-action)所描述的, Go语言原生的`map`类型并不支持并发读写。`concurrent-map`提供了一种高性能的解决方案:通过对内部`map`进行分片，降低锁粒度，从而达到最少的锁等待时间(锁冲突)
 
-Prior to Go 1.9, there was no concurrent map implementation in the stdlib. In Go 1.9, `sync.Map` was introduced. The new `sync.Map` has a few key differences from this map. The stdlib `sync.Map` is designed for append-only scenarios. So if you want to use the map for something more like in-memory db, you might benefit from using our version. You can read more about it in the golang repo, for example [here](https://github.com/golang/go/issues/21035) and [here](https://stackoverflow.com/questions/11063473/map-with-concurrent-access)
+在Go 1.9之前，go语言标准库中并没有实现并发`map`。在Go 1.9中，引入了`sync.Map`。新的`sync.Map`与此`concurrent-map`有几个关键区别。标准库中的`sync.Map`是专为`append-only`场景设计的。因此，如果您想将`Map`用于一个类似内存数据库，那么使用我们的版本可能会受益。你可以在golang repo上读到更多，[这里](https://github.com/golang/go/issues/21035) and [这里](https://stackoverflow.com/questions/11063473/map-with-concurrent-access)
+***译注:`sync.Map`在读多写少性能比较好，否则并发性能很差***
 
-## usage
+## 用法
 
-Import the package:
+导入包:
 
 ```go
 import (
-	"github.com/orcaman/concurrent-map/v2"
+	"github.com/Coloured-glaze/cmap"
 )
 
 ```
 
 ```bash
-go get "github.com/orcaman/concurrent-map/v2"
+go get "github.com/Coloured-glaze/cmap"
 ```
 
-The package is now imported under the "cmap" namespace.
-
-## example
+## 示例
 
 ```go
 
-	// Create a new map.
-	m := cmap.New[string]()
+	// 创建一个新的 map.
+	m := cmap.New[int]()
 
-	// Sets item within map, sets "bar" under key "foo"
-	m.Set("foo", "bar")
+	// 设置变量m一个键为“key”值为“100”键值对
+	m.Set("key", 100)
 
-	// Retrieve item from map.
-	bar, ok := m.Get("foo")
+	// 从m中获取指定键值.
+	v, ok := m.Get("key")
 
-	// Removes item under key "foo"
-	m.Remove("foo")
+	// 删除键为“key”的项
+	m.Remove("key")
 
 ```
 
-For more examples have a look at concurrent_map_test.go.
+```go
 
-Running tests:
+	// 创建一个新的 map.
+	m := cmap.New[map[string]int]()
+
+	// 设置变量m一个键为 "user" 值为 map[string]int 键值对
+	m.Set("user", map[string]int)
+
+	// 从m中获取指定键值.
+	v, ok := m.Get("user")
+
+	// 删除键为“foo”的项
+	m.Remove("user")
+```
+
+更多使用示例请查看`concurrent_map_test.go`.
+
+运行测试:
 
 ```bash
-go test "github.com/orcaman/concurrent-map/v2"
+go test "github.com/Coloured-glaze/cmap"
 ```
 
-## guidelines for contributing
+## 贡献说明
 
-Contributions are highly welcome. In order for a contribution to be merged, please follow these guidelines:
-- Open an issue and describe what you are after (fixing a bug, adding an enhancement, etc.).
-- According to the core team's feedback on the above mentioned issue, submit a pull request, describing the changes and linking to the issue.
-- New code must have test coverage.
-- If the code is about performance issues, you must include benchmarks in the process (either in the issue or in the PR).
-- In general, we would like to keep `concurrent-map` as simple as possible and as similar to the native `map`. Please keep this in mind when opening issues.
+我们非常欢迎大家的贡献。如欲合并贡献，请遵循以下指引:
+- 新建一个issue,并且叙述为什么这么做(解决一个bug，增加一个功能，等等)
+- 根据核心团队对上述问题的反馈，提交一个PR，描述变更并链接到该问题。
+- 新代码必须具有测试覆盖率。
+- 如果代码是关于性能问题的，则必须在流程中包括基准测试(无论是在问题中还是在PR中)。
+- 一般来说，我们希望`concurrent-map`尽可能简单，且与原生的`map`有相似的操作。当你新建issue时请注意这一点。
 
-## language
-- [中文说明](./README-zh.md)
-
-## license
-MIT (see [LICENSE](https://github.com/orcaman/concurrent-map/blob/master/LICENSE) file)
+## 许可证
+MIT (see [LICENSE](https://github.com/Coloured-glaze/cmap/blob/master/LICENSE) file)
