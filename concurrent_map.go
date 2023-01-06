@@ -79,7 +79,7 @@ func (cms *ConcurrentMapShared[K, V]) GetMap() map[K]V {
 
 // GetShard returns shard under given key
 //
-// GetShard 返回给定key下的map分片
+// GetShard 返回给定key下的map分片, 可进行锁操作
 func (m ConcurrentMap[K, V]) GetShard(key K) *ConcurrentMapShared[K, V] {
 	return m.shards[uint(m.sharding(key))%uint(SHARD_COUNT)]
 }
