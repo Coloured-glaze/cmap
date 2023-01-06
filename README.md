@@ -44,7 +44,7 @@ go get "github.com/Coloured-glaze/cmap"
 	m := cmap.New[map[string]int]()
 
 	// 设置变量m一个键为 "user" 值为 map[string]int 键值对
-	m.Set("user", map[string]int)
+	m.Set("user", make(map[string]int))
 
 	// 从m中获取指定键值.
 	v, ok := m.Get("user")
@@ -69,6 +69,10 @@ go test "github.com/Coloured-glaze/cmap"
 - 新代码必须具有测试覆盖率。
 - 如果代码是关于性能问题的，则必须在流程中包括基准测试(无论是在问题中还是在PR中)。
 - 一般来说，我们希望`concurrent-map`尽可能简单，且与原生的`map`有相似的操作。当你新建issue时请注意这一点。
+
+## language
+- [中文说明](./README.md)
+- [English description](./README-en.md)
 
 ## 许可证
 MIT (see [LICENSE](https://github.com/Coloured-glaze/cmap/blob/master/LICENSE) file)

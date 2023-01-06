@@ -39,6 +39,22 @@ The package is now imported under the "cmap" namespace.
 
 ```
 
+```go
+
+	// Create a new map.
+	m := cmap.New[map[string]int]()
+
+	// Sets item within map, sets "bar" under key "foo"
+	m.Set("user", make(map[string]int))
+
+	// Retrieve item from map.
+	bar, ok := m.Get("user")
+
+	// Removes item under key "foo"
+	m.Remove("user")
+
+```
+
 For more examples have a look at concurrent_map_test.go.
 
 Running tests:
